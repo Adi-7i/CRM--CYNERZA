@@ -1,4 +1,4 @@
-# 🚀 CRM Pro - Enterprise Customer Relationship Management
+# 🚀 CYNERZA-CRM  - Enterprise Customer Relationship Management
 
 <div align="center">
 
@@ -275,6 +275,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Recharts](https://recharts.org/) for data visualization
 - [FastAPI](https://fastapi.tiangolo.com/) for the amazing Python framework
 - [Next.js](https://nextjs.org/) for the React framework
+
+---
+
+## 👤 Author
+
+**Aditya** - *Lead Developer*
 
 ---
 
