@@ -38,7 +38,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     # Encode the JWT
     encoded_jwt = jwt.encode(
         to_encode,
-        settings.JWT_SECRET_KEY,
+        settings.SECRET_KEY,
         algorithm=settings.ALGORITHM
     )
     
@@ -69,7 +69,7 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
     # Encode the JWT
     encoded_jwt = jwt.encode(
         to_encode,
-        settings.JWT_SECRET_KEY,
+        settings.SECRET_KEY,
         algorithm=settings.ALGORITHM
     )
     
@@ -92,7 +92,7 @@ def decode_token(token: str) -> Dict[str, Any]:
     try:
         payload = jwt.decode(
             token,
-            settings.JWT_SECRET_KEY,
+            settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM]
         )
         return payload
