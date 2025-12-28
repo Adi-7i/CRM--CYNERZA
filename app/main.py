@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api.v1.endpoints import users, auth, protected, leads, customers, deals
+from app.api.v1.endpoints import users, auth, protected, leads, customers, deals, tasks
 from app.models.base import Base
 from app.core.database import engine
 
@@ -77,6 +77,13 @@ app.include_router(
     deals.router,
     prefix=f"{settings.API_V1_STR}/deals",
     tags=["deals"]
+)
+
+# Task & Follow-Up management routes
+app.include_router(
+    tasks.router,
+    prefix=f"{settings.API_V1_STR}/tasks",
+    tags=["tasks"]
 )
 
 
