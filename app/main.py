@@ -1,32 +1,98 @@
 """
 Main FastAPI application entry point.
+Production-ready with error handling, logging, and middleware.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from app.core.config import settings
-from app.api.v1.endpoints import users, auth, leads, customers, deals, tasks, analytics
+from app.core.logging_config import setup_logging, get_logger
+from app.core.error_handlers import register_exception_handlers
+from app.middleware.logging_middleware import RequestLoggingMiddleware
+from app.api.v1.endpoints import users, auth, leads, customers, deals, tasks, analytics, health
 from app.models.base import Base
 from app.core.database import engine
 
 
-# Create database tables
-# Note: In production, use Alembic migrations instead
-Base.metadata.create_all(bind=engine)
+# Setup logging before anything else
+setup_logging()
+logger = get_logger(__name__)
 
 
-# Initialize FastAPI application
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Application lifespan events.
+    Handles startup and shutdown logic.
+    """
+    # Startup
+    logger.info(
+        f"Starting {settings.PROJECT_NAME} v{settings.VERSION}",
+        extra={"environment": settings.ENVIRONMENT}
+    )
+    
+    # Create database tables if they don't exist
+    # Note: In production, use Alembic migrations instead
+    Base.metadata.create_all(bind=engine)
+    
+    yield
+    
+    # Shutdown
+    logger.info(f"Shutting down {settings.PROJECT_NAME}")
+
+
+# Initialize FastAPI application with enhanced OpenAPI docs
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Enterprise CRM Backend API",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    description="""
+## Enterprise CRM Backend API
+
+A comprehensive Customer Relationship Management system with:
+
+### Features
+- **Lead Management**: Track and nurture sales leads
+- **Customer Management**: Manage customer relationships and interactions
+- **Deal/Opportunity Management**: Pipeline with Kanban-ready data
+- **Task & Follow-Up Management**: Task tracking with entity relationships
+- **Analytics & Dashboard**: Business insights and KPIs
+
+### Authentication
+All endpoints require JWT authentication except public health checks.
+Use `/api/v1/auth/login` to obtain access tokens.
+
+### Roles
+- **Admin**: Full system access
+- **Manager**: Team-level access
+- **Sales**: Own records only
+    """,
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json" if settings.DEBUG else None,
+    lifespan=lifespan,
+    openapi_tags=[
+        {"name": "authentication", "description": "User authentication and token management"},
+        {"name": "users", "description": "User management (admin only)"},
+        {"name": "leads", "description": "Lead management and tracking"},
+        {"name": "customers", "description": "Customer management and interactions"},
+        {"name": "deals", "description": "Deal/Opportunity pipeline management"},
+        {"name": "tasks", "description": "Task and follow-up management"},
+        {"name": "analytics", "description": "Dashboard and business analytics"},
+        {"name": "health", "description": "Health checks and monitoring"},
+    ]
 )
 
 
-# Configure CORS
+# Register exception handlers
+register_exception_handlers(app)
+
+
+# Add middleware (order matters - first added = last executed)
+# Request logging middleware
+app.add_middleware(RequestLoggingMiddleware)
+
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
@@ -37,6 +103,13 @@ app.add_middleware(
 
 
 # Include routers
+# Health check routes (no auth required)
+app.include_router(
+    health.router,
+    prefix=f"{settings.API_V1_STR}/health",
+    tags=["health"]
+)
+
 # Authentication routes
 app.include_router(
     auth.router,
@@ -87,34 +160,27 @@ app.include_router(
 )
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def root():
     """
-    Root endpoint - Health check.
+    Root endpoint - Basic info and health check redirect.
     """
     return {
         "message": f"Welcome to {settings.PROJECT_NAME}",
         "version": settings.VERSION,
-        "status": "operational"
-    }
-
-
-@app.get("/health")
-def health_check():
-    """
-    Health check endpoint.
-    """
-    return {
-        "status": "healthy",
-        "environment": settings.ENVIRONMENT
+        "environment": settings.ENVIRONMENT,
+        "docs": "/docs" if settings.DEBUG else "Disabled in production",
+        "health": f"{settings.API_V1_STR}/health"
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+    
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=True if settings.ENVIRONMENT == "development" else False
+        reload=settings.is_development,
+        log_level=settings.LOG_LEVEL.lower()
     )
