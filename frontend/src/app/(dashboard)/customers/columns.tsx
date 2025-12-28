@@ -39,7 +39,7 @@ export const columns: ColumnDef<Customer>[] = [
         accessorKey: "company",
         header: "Company",
         cell: ({ row }) => {
-            const company = row.getValue("company");
+            const company = row.getValue("company") as string | null;
             return <div>{company || "N/A"}</div>;
         },
     },
