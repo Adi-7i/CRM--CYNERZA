@@ -1,5 +1,57 @@
 import api from './api';
-import { AnalyticsResponse, AnalyticsFilters } from '@/types/analytics';
+import { AnalyticsResponse, AnalyticsFilters, LeadsOverviewData, DealPipelineData, RevenueData, SalesPerformanceData } from '@/types/analytics';
+
+// Define backend response types matching the schema
+interface DashboardOverviewResponse {
+    total_leads: number;
+    active_leads: number;
+    converted_customers: number;
+    total_customers: number;
+    total_deals: number;
+    won_deals: number;
+    lost_deals: number;
+    active_deals: number;
+    total_revenue: number;
+    pipeline_value: number;
+    weighted_pipeline: number;
+    active_tasks: number;
+    overdue_tasks: number;
+}
+
+interface LeadAnalyticsResponse {
+    total_leads: number;
+    conversion_rate: number;
+    source_distribution: Record<string, number>;
+    status_distribution: Record<string, number>;
+    monthly_leads: Record<string, number>;
+}
+
+interface DealAnalyticsResponse {
+    total_deals: number;
+    total_value: number;
+    average_deal_value: number;
+    win_rate: number;
+    stage_distribution: Record<string, number>;
+    stage_value_distribution: Record<string, number>;
+    monthly_revenue: Record<string, number>;
+}
+
+interface SalesPerformanceResponse {
+    users: {
+        user_id: number;
+        user_name: string;
+        user_email: string;
+        leads_assigned: number;
+        customers_managed: number;
+        deals_owned: number;
+        total_deal_value: number;
+        won_deals: number;
+        win_rate: number;
+        active_tasks: number;
+    }[];
+    total_users: number;
+}
+
 
 export const analyticsService = {
     async getAnalytics(filters?: AnalyticsFilters): Promise<AnalyticsResponse> {
@@ -9,51 +61,77 @@ export const analyticsService = {
         if (filters?.user_id) params.append('user_id', filters.user_id.toString());
         if (filters?.team_id) params.append('team_id', filters.team_id.toString());
 
-        const response = await api.get<AnalyticsResponse>(
-            `/analytics/?${params.toString()}`
-        );
-        return response.data;
-    },
+        const queryString = params.toString() ? `?${params.toString()}` : '';
 
-    // Mock data for development (remove when backend is ready)
-    async getMockAnalytics(): Promise<AnalyticsResponse> {
+        // Fetch all data in parallel
+        const [dashboardRes, leadsRes, dealsRes, salesRes] = await Promise.all([
+            api.get<DashboardOverviewResponse>(`/analytics/dashboard${queryString}`),
+            api.get<LeadAnalyticsResponse>(`/analytics/leads${queryString}`),
+            api.get<DealAnalyticsResponse>(`/analytics/deals${queryString}`),
+            api.get<SalesPerformanceResponse>(`/analytics/sales-performance${queryString}`)
+        ]);
+
+        const dashboard = dashboardRes.data;
+        const leads = leadsRes.data;
+        const deals = dealsRes.data;
+        const sales = salesRes.data;
+
+        // Map Leads Overview (Monthly Trend)
+        // Backend gives { "2024-01": 10 }, Frontend wants [{ date: "2024-01", new: 10, ... }]
+        // Since we don't have status breakdown per month, we put everything in 'new' for now
+        const leadsOverview: LeadsOverviewData[] = Object.entries(leads.monthly_leads)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, count]) => ({
+                date,
+                new: count,
+                contacted: 0,
+                qualified: 0,
+                lost: 0
+            }));
+
+        // Map Deal Pipeline
+        const dealPipeline: DealPipelineData[] = Object.entries(deals.stage_distribution).map(([stage, count]) => ({
+            stage,
+            count,
+            value: Number(deals.stage_value_distribution[stage] || 0)
+        }));
+
+        // Verify stage order or sort if needed (optional)
+
+        // Map Revenue Trend
+        const revenueTrend: RevenueData[] = Object.entries(deals.monthly_revenue)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([month, revenue]) => ({
+                month,
+                revenue: Number(revenue),
+                target: 0 // Target could be fetched from settings in future
+            }));
+
+        // Map Sales Performance
+        const salesPerformance: SalesPerformanceData[] = sales.users.map(user => ({
+            name: user.user_name,
+            deals_won: user.won_deals,
+            revenue: Number(user.total_deal_value), // Use total value or revenue from won deals
+            conversion_rate: user.win_rate
+        }));
+
         return {
             summary: {
-                total_leads: 156,
-                total_customers: 89,
-                total_revenue: 245680,
-                total_deals: 42,
-                conversion_rate: 57.1
+                total_leads: dashboard.total_leads,
+                total_customers: dashboard.total_customers,
+                total_revenue: Number(dashboard.total_revenue),
+                total_deals: dashboard.total_deals,
+                conversion_rate: leads.conversion_rate
             },
-            leads_overview: [
-                { date: '2024-01', new: 45, contacted: 38, qualified: 25, lost: 12 },
-                { date: '2024-02', new: 52, contacted: 45, qualified: 30, lost: 15 },
-                { date: '2024-03', new: 48, contacted: 42, qualified: 28, lost: 10 },
-                { date: '2024-04', new: 61, contacted: 55, qualified: 35, lost: 18 },
-                { date: '2024-05', new: 58, contacted: 50, qualified: 32, lost: 14 },
-                { date: '2024-06', new: 65, contacted: 58, qualified: 40, lost: 16 }
-            ],
-            deal_pipeline: [
-                { stage: 'Prospecting', count: 15, value: 75000 },
-                { stage: 'Qualification', count: 12, value: 84000 },
-                { stage: 'Proposal', count: 8, value: 96000 },
-                { stage: 'Negotiation', count: 5, value: 125000 },
-                { stage: 'Closed Won', count: 42, value: 520000 }
-            ],
-            revenue_trend: [
-                { month: 'Jan', revenue: 35000, target: 40000 },
-                { month: 'Feb', revenue: 42000, target: 40000 },
-                { month: 'Mar', revenue: 38000, target: 40000 },
-                { month: 'Apr', revenue: 51000, target: 45000 },
-                { month: 'May', revenue: 48000, target: 45000 },
-                { month: 'Jun', revenue: 56000, target: 50000 }
-            ],
-            sales_performance: [
-                { name: 'John Doe', deals_won: 12, revenue: 145000, conversion_rate: 68.5 },
-                { name: 'Jane Smith', deals_won: 10, revenue: 128000, conversion_rate: 62.3 },
-                { name: 'Mike Johnson', deals_won: 8, revenue: 98000, conversion_rate: 55.1 },
-                { name: 'Sarah Williams', deals_won: 7, revenue: 87000, conversion_rate: 51.8 }
-            ]
+            leads_overview: leadsOverview,
+            deal_pipeline: dealPipeline,
+            revenue_trend: revenueTrend,
+            sales_performance: salesPerformance
         };
+    },
+
+    // Kept for reference but not used
+    async getMockAnalytics(): Promise<AnalyticsResponse> {
+        return this.getAnalytics(); // Failover or just recursive if called (should not be called)
     }
 };

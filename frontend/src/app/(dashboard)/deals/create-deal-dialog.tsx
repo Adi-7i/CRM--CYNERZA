@@ -12,38 +12,51 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useCreateDeal } from "@/hooks/useDeals";
-import { Loader2 } from "lucide-react";
+import { useCustomers } from "@/hooks/useCustomers";
+import { Loader2, Plus } from "lucide-react";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 
 export function CreateDealDialog() {
     const [open, setOpen] = useState(false);
     const createDeal = useCreateDeal();
+    const { data: customers } = useCustomers();
     const [formData, setFormData] = useState({
         title: "",
-        customer_id: 1,
-        value: 0,
+        customer_id: "",
+        value: "",
         stage: "Prospecting",
+        probability: 50,
         expected_close_date: ""
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await createDeal.mutateAsync(formData);
+            await createDeal.mutateAsync({
+                title: formData.title,
+                customer_id: parseInt(formData.customer_id),
+                value: parseFloat(formData.value),
+                stage: formData.stage,
+                probability: formData.probability,
+                expected_close_date: formData.expected_close_date || undefined
+            });
             setOpen(false);
             setFormData({
                 title: "",
-                customer_id: 1,
-                value: 0,
+                customer_id: "",
+                value: "",
                 stage: "Prospecting",
+                probability: 50,
                 expected_close_date: ""
             });
         } catch (error) {
@@ -54,61 +67,91 @@ export function CreateDealDialog() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Add Deal</Button>
+                <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Deal
+                </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[500px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Add New Deal</DialogTitle>
+                        <DialogTitle>Create New Deal</DialogTitle>
                         <DialogDescription>
-                            Create a new sales opportunity.
+                            Add a new sales opportunity to your pipeline.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="title">Title</Label>
+                            <Label htmlFor="title">Deal Title *</Label>
                             <Input
                                 id="title"
+                                placeholder="Enterprise Software License"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 required
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="customer_id">Customer ID</Label>
-                            <Input
-                                id="customer_id"
-                                type="number"
+                            <Label htmlFor="customer">Customer *</Label>
+                            <Select
                                 value={formData.customer_id}
-                                onChange={(e) => setFormData({ ...formData, customer_id: parseInt(e.target.value) })}
-                                required
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="value">Value ($)</Label>
-                            <Input
-                                id="value"
-                                type="number"
-                                value={formData.value}
-                                onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) })}
-                                required
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="stage">Stage</Label>
-                            <Select onValueChange={(val) => setFormData({ ...formData, stage: val })} defaultValue={formData.stage}>
+                                onValueChange={(val) => setFormData({ ...formData, customer_id: val })}
+                            >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select stage" />
+                                    <SelectValue placeholder="Select a customer" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Prospecting">Prospecting</SelectItem>
-                                    <SelectItem value="Qualification">Qualification</SelectItem>
-                                    <SelectItem value="Proposal">Proposal</SelectItem>
-                                    <SelectItem value="Negotiation">Negotiation</SelectItem>
-                                    <SelectItem value="Closed Won">Closed Won</SelectItem>
-                                    <SelectItem value="Closed Lost">Closed Lost</SelectItem>
+                                    {customers?.map((customer) => (
+                                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                                            {customer.full_name} {customer.company ? `(${customer.company})` : ''}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="value">Value ($) *</Label>
+                                <Input
+                                    id="value"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="10000"
+                                    value={formData.value}
+                                    onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="stage">Stage</Label>
+                                <Select
+                                    value={formData.stage}
+                                    onValueChange={(val) => setFormData({ ...formData, stage: val })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select stage" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Prospecting">Prospecting</SelectItem>
+                                        <SelectItem value="Qualification">Qualification</SelectItem>
+                                        <SelectItem value="Proposal">Proposal</SelectItem>
+                                        <SelectItem value="Negotiation">Negotiation</SelectItem>
+                                        <SelectItem value="Closed Won">Closed Won</SelectItem>
+                                        <SelectItem value="Closed Lost">Closed Lost</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label>Win Probability: {formData.probability}%</Label>
+                            <Slider
+                                value={[formData.probability]}
+                                onValueChange={(val) => setFormData({ ...formData, probability: val[0] })}
+                                max={100}
+                                step={5}
+                                className="py-2"
+                            />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="expected_close_date">Expected Close Date</Label>
@@ -117,14 +160,13 @@ export function CreateDealDialog() {
                                 type="date"
                                 value={formData.expected_close_date}
                                 onChange={(e) => setFormData({ ...formData, expected_close_date: e.target.value })}
-                                required
                             />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" disabled={createDeal.isPending}>
+                        <Button type="submit" disabled={createDeal.isPending || !formData.customer_id}>
                             {createDeal.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save changes
+                            Create Deal
                         </Button>
                     </DialogFooter>
                 </form>

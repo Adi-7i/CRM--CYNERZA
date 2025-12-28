@@ -1,10 +1,11 @@
 interface PageHeaderProps {
     title: string;
     description?: string;
+    action?: React.ReactNode;
     children?: React.ReactNode;
 }
 
-export function PageHeader({ title, description, children }: PageHeaderProps) {
+export function PageHeader({ title, description, action, children }: PageHeaderProps) {
     return (
         <div className="flex items-center justify-between space-y-2">
             <div>
@@ -14,6 +15,7 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
                 )}
             </div>
             <div className="flex items-center space-x-2">
+                {action}
                 {children}
             </div>
         </div>

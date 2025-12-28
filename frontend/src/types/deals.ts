@@ -8,6 +8,19 @@ export interface Deal {
     expected_close_date: string | null;
     owner_id: number;
     created_at: string;
+    updated_at: string;
+    weighted_value?: number;
+    customer?: {
+        id: number;
+        full_name: string;
+        email: string;
+        company?: string;
+    };
+    owner?: {
+        id: number;
+        full_name: string;
+        email: string;
+    };
 }
 
 export interface CreateDealDTO {

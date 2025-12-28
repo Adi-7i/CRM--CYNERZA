@@ -6,6 +6,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import NextTopLoader from 'nextjs-toploader';
 import { GlobalErrorBoundary } from "@/components/shared/GlobalErrorBoundary";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +40,7 @@ export default function RootLayout({
             speed={200}
             shadow="0 0 10px #7c3aed,0 0 5px #7c3aed"
           />
+          <Toaster position="top-right" richColors />
           <QueryProvider>
             <AuthProvider>
               <GlobalErrorBoundary>

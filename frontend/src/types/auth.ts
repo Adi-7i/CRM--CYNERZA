@@ -1,8 +1,16 @@
 export interface User {
-    id: string;
+    id: number;
     email: string;
-    name: string;
-    role: 'admin' | 'user' | 'manager';
+    full_name: string;
+    name?: string;  // Alias for compatibility
+    role: 'admin' | 'manager' | 'sales';
+    is_active: boolean;
+}
+
+export interface LoginResponse {
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
 }
 
 export interface AuthResponse {
@@ -15,6 +23,9 @@ export interface LoginCredentials {
     password: string;
 }
 
-export interface RegisterCredentials extends LoginCredentials {
-    name: string;
+export interface RegisterCredentials {
+    email: string;
+    full_name: string;
+    password: string;
+    role?: 'admin' | 'manager' | 'sales';
 }
