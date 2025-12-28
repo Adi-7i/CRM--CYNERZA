@@ -5,7 +5,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_admin
+from app.api.deps import get_db
+from app.core.permissions import require_admin
 from app.crud import user as user_crud
 from app.schemas.user import UserCreate, UserUpdate, UserResponse
 from app.models.user import User

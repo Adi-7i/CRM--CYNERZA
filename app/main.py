@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api.v1.endpoints import users, auth, protected
+from app.api.v1.endpoints import users, auth, protected, leads
 from app.models.base import Base
 from app.core.database import engine
 
@@ -56,6 +56,13 @@ app.include_router(
     protected.router,
     prefix=f"{settings.API_V1_STR}/protected",
     tags=["protected-examples"]
+)
+
+# Lead management routes
+app.include_router(
+    leads.router,
+    prefix=f"{settings.API_V1_STR}/leads",
+    tags=["leads"]
 )
 
 

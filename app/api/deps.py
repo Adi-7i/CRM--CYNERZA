@@ -116,34 +116,3 @@ def get_current_active_user(
             detail="Inactive user"
         )
     return current_user
-
-
-def require_role(*allowed_roles: UserRole):
-    """
-    Factory function to create a dependency that checks user role.
-    
-    Args:
-        allowed_roles: Roles that are allowed to access the endpoint
-        
-    Returns:
-        Dependency function that validates user role
-        
-    Usage:
-        @router.get("/admin-only")
-        def admin_route(user: User = Depends(require_role(UserRole.ADMIN))):
-            return {"message": "Admin access"}
-    """
-    def role_checker(current_user: User = Depends(get_current_active_user)) -> User:
-        if current_user.role not in allowed_roles:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. Required role: {', '.join([r.value for r in allowed_roles])}"
-            )
-        return current_user
-    
-    return role_checker
-
-
-# Common role dependencies
-require_admin = require_role(UserRole.ADMIN)
-require_manager_or_admin = require_role(UserRole.ADMIN, UserRole.MANAGER)

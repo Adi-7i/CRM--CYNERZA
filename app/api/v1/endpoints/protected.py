@@ -2,10 +2,13 @@
 Example protected endpoints demonstrating authentication and authorization.
 """
 from fastapi import APIRouter, Depends
-from app.api.deps import (
-    get_current_active_user,
+from app.api.deps import get_current_active_user
+from app.core.permissions import (
     require_admin,
-    require_manager_or_admin,
+    require_manager,
+    require_sales,
+    require_admin_or_manager,
+    require_manager_or_sales,
     require_role
 )
 from app.models.user import User, UserRole
@@ -66,7 +69,7 @@ def admin_only_endpoint(
 
 @router.get("/management")
 def management_endpoint(
-    current_user: User = Depends(require_manager_or_admin)
+    current_user: User = Depends(require_admin_or_manager)
 ):
     """
     Management endpoint - Requires manager or admin role.
@@ -80,6 +83,22 @@ def management_endpoint(
             "email": current_user.email,
             "role": current_user.role.value
         }
+    }
+
+
+@router.get("/manager-only")
+def manager_only_endpoint(
+    current_user: User = Depends(require_manager)
+):
+    """
+    Manager-only endpoint - Requires manager role specifically.
+    
+    Only users with manager role can access this endpoint (not admins).
+    """
+    return {
+        "message": "This is a manager-only endpoint",
+        "access": "Managers only",
+        "user": current_user.email
     }
 
 
@@ -123,3 +142,40 @@ def user_dashboard(
         dashboard_data["sections"] = ["Leads", "Deals", "Activities"]
     
     return dashboard_data
+
+
+@router.get("/sales-and-managers")
+def sales_and_managers_endpoint(
+    current_user: User = Depends(require_manager_or_sales)
+):
+    """
+    Endpoint for sales team and managers.
+    
+    Accessible by both sales team members and managers.
+    """
+    return {
+        "message": "Sales and managers endpoint",
+        "access": "Sales team and Managers",
+        "user": {
+            "email": current_user.email,
+            "role": current_user.role.value
+        },
+        "features": ["View customers", "Create deals", "Update leads"]
+    }
+
+
+@router.get("/custom-permission")
+def custom_permission_endpoint(
+    current_user: User = Depends(require_role(UserRole.ADMIN, UserRole.MANAGER))
+):
+    """
+    Example of custom role combination using require_role factory.
+    
+    This demonstrates how to create custom permission combinations.
+    """
+    return {
+        "message": "Custom permission example",
+        "access": "Admin or Manager (using require_role factory)",
+        "user": current_user.email,
+        "info": "You can combine any roles using require_role(...)"
+    }
