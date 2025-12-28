@@ -9,8 +9,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
-export default function LoginPage() {
-    const { login } = useAuth();
+export default function RegisterPage() {
+    const { register } = useAuth();
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -21,10 +22,10 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
         try {
-            await login({ email, password });
+            await register({ name, email, password });
         } catch (err: any) {
             if (err.response) {
-                setError(err.response.data.detail || "Login failed");
+                setError(err.response.data.detail || "Registration failed");
             } else {
                 setError("Something went wrong");
             }
@@ -36,11 +37,22 @@ export default function LoginPage() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Login</CardTitle>
-                <CardDescription>Enter your credentials to access your account.</CardDescription>
+                <CardTitle>Create Account</CardTitle>
+                <CardDescription>Enter your details to create a new account.</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input
+                            id="name"
+                            type="text"
+                            placeholder="John Doe"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
@@ -67,10 +79,10 @@ export default function LoginPage() {
                 <CardFooter className="flex flex-col gap-4">
                     <Button className="w-full" disabled={isLoading}>
                         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Sign In
+                        Create Account
                     </Button>
                     <p className="text-sm text-muted-foreground text-center">
-                        Don't have an account? <Link href="/register" className="text-primary hover:underline">Sign up</Link>
+                        Already have an account? <Link href="/login" className="text-primary hover:underline">Sign in</Link>
                     </p>
                 </CardFooter>
             </form>

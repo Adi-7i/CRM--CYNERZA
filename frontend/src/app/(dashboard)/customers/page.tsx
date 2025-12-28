@@ -1,12 +1,29 @@
+"use client";
+
+import { useCustomers } from "@/hooks/useCustomers";
+import { columns } from "./columns";
+import { DataTable } from "@/components/shared/DataTable";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { CreateCustomerDialog } from "./create-customer-dialog";
+
 export default function CustomersPage() {
+    const { data: customers, isLoading, isError } = useCustomers();
+
+    if (isError) {
+        return <div>Error loading customers.</div>;
+    }
+
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Customers</h1>
-            </div>
-            <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
-                Customers management interface will go here.
-            </div>
+            <PageHeader title="Customers" description="Manage your customer base.">
+                <CreateCustomerDialog />
+            </PageHeader>
+
+            <DataTable
+                columns={columns}
+                data={customers || []}
+                isLoading={isLoading}
+            />
         </div>
     );
 }

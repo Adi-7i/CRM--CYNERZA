@@ -1,12 +1,29 @@
+"use client";
+
+import { useTasks } from "@/hooks/useTasks";
+import { columns } from "./columns";
+import { DataTable } from "@/components/shared/DataTable";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { CreateTaskDialog } from "./create-task-dialog";
+
 export default function TasksPage() {
+    const { data: tasks, isLoading, isError } = useTasks();
+
+    if (isError) {
+        return <div>Error loading tasks.</div>;
+    }
+
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Tasks</h1>
-            </div>
-            <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
-                Task management interface will go here.
-            </div>
+            <PageHeader title="Tasks" description="Manage your daily tasks.">
+                <CreateTaskDialog />
+            </PageHeader>
+
+            <DataTable
+                columns={columns}
+                data={tasks || []}
+                isLoading={isLoading}
+            />
         </div>
     );
 }

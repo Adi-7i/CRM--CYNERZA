@@ -25,6 +25,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -42,6 +43,7 @@ const navItems = [
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { user, logout } = useAuth();
 
     return (
         <div className="flex min-h-screen w-full bg-muted/40">
@@ -109,22 +111,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </Sheet>
                     {/* Breadcrumbs could go here */}
                     <div className="ml-auto flex items-center gap-2">
+                        <span className="text-sm font-medium hidden md:inline-block">
+                            {user?.name || 'User'}
+                        </span>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" className="rounded-full">
                                     <Avatar>
                                         <AvatarImage src="/placeholder-user.jpg" alt="User" />
-                                        <AvatarFallback>AD</AvatarFallback>
+                                        <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || 'US'}</AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                                    {user?.role || 'user'}
+                                </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuItem>Support</DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>Logout</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => logout()}>Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

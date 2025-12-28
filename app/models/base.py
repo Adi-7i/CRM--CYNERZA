@@ -30,6 +30,7 @@ class BaseModel(Base):
         DateTime,
         default=datetime.utcnow,
         nullable=False,
+        index=True,
         comment="Timestamp when record was created"
     )
     
