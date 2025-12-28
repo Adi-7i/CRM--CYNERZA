@@ -5,10 +5,12 @@ from app.models.base import Base
 from app.models.user import User
 from app.models.lead import Lead, LeadNote, LeadStatus, LeadSource
 from app.models.customer import Customer, CustomerInteraction, InteractionType
+from app.models.deal import Deal, DealStage
 
 # Export all models for easy importing
 __all__ = [
     "Base", "User", 
     "Lead", "LeadNote", "LeadStatus", "LeadSource",
-    "Customer", "CustomerInteraction", "InteractionType"
+    "Customer", "CustomerInteraction", "InteractionType",
+    "Deal", "DealStage"
 ]
