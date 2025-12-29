@@ -23,7 +23,9 @@ export type Permission =
     | 'leads:delete'
     | 'leads:assign'
     | 'leads:convert'
+    | 'leads:convert'
     | 'leads:export'
+    | 'leads:import'
     // Customer permissions
     | 'customers:create'
     | 'customers:edit'
@@ -67,7 +69,8 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
         'nav:tasks', 'nav:users', 'nav:reports', 'nav:settings',
         // Leads - full access
         'leads:create', 'leads:edit', 'leads:delete', 'leads:assign',
-        'leads:convert', 'leads:export',
+        'leads:create', 'leads:edit', 'leads:delete', 'leads:assign',
+        'leads:convert', 'leads:export', 'leads:import',
         // Customers - full access
         'customers:create', 'customers:edit', 'customers:delete',
         'customers:assign', 'customers:export',
@@ -89,7 +92,8 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
         'nav:dashboard', 'nav:leads', 'nav:customers', 'nav:deals',
         'nav:tasks', 'nav:reports',
         // Leads - full access except delete
-        'leads:create', 'leads:edit', 'leads:assign', 'leads:convert', 'leads:export',
+        // Leads - full access except delete
+        'leads:create', 'leads:edit', 'leads:assign', 'leads:convert', 'leads:export', 'leads:import',
         // Customers - full access except delete
         'customers:create', 'customers:edit', 'customers:assign', 'customers:export',
         // Deals - full access except delete

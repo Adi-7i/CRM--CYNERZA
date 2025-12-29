@@ -34,3 +34,18 @@ export interface CreateLeadDTO {
 }
 
 export interface UpdateLeadDTO extends Partial<CreateLeadDTO> { }
+
+export interface ImportError {
+    row: number;
+    field?: string;
+    error: string;
+}
+
+export interface LeadImportResponse {
+    total_rows: number;
+    inserted: number;
+    skipped_duplicates: number;
+    error_count: number;
+    errors: ImportError[];
+    inserted_lead_ids: number[];
+}
