@@ -79,63 +79,57 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const getRoleBadgeColor = (role: string) => {
         switch (role) {
-            case 'admin': return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
-            case 'manager': return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
-            case 'sales': return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
-            default: return 'bg-gray-100 text-gray-700';
+            case 'admin': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300';
+            case 'manager': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+            case 'sales': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+            default: return 'bg-muted text-muted-foreground';
         }
     };
 
     return (
-        <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex min-h-screen bg-background">
             {/* Desktop Sidebar */}
-            <aside className="hidden w-64 flex-col border-r bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 sm:flex shadow-xl overflow-y-auto sticky top-0 h-screen">
-                <div className="flex h-16 items-center border-b px-6 bg-white dark:bg-gray-900">
+            <aside className="hidden w-64 flex-col border-r bg-card sm:flex overflow-y-auto sticky top-0 h-screen">
+                <div className="flex h-14 items-center border-b px-4">
                     <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                            <span className="text-white font-bold text-xl">C</span>
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                            <span className="text-primary-foreground font-bold text-lg">C</span>
                         </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                            CRM Pro
+                        <span className="text-lg font-semibold">
+                            CYNERZA CRM
                         </span>
                     </Link>
                 </div>
-                <nav className="flex-1 px-4 py-6 space-y-2">
+                <nav className="flex-1 px-3 py-4 space-y-1">
                     {filteredNavItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all relative group",
+                                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                 pathname === item.href
-                                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
-                                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             )}
                         >
-                            {pathname === item.href && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl blur-md opacity-30" />
-                            )}
-                            <item.icon className={cn(
-                                "h-5 w-5 relative z-10",
-                                pathname === item.href ? "text-white" : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-white"
-                            )} />
-                            <span className="relative z-10 font-medium">{item.label}</span>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.label}</span>
                         </Link>
                     ))}
                 </nav>
 
                 {/* User info at bottom of sidebar */}
                 {user && (
-                    <div className="border-t p-4">
+                    <div className="border-t p-3">
                         <div className="flex items-center gap-3 px-2">
-                            <Avatar className="h-9 w-9">
-                                <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                                     {(user.full_name || user.email).charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium truncate">{user.name || user.email}</p>
-                                <span className={cn("text-xs px-2 py-0.5 rounded-full", getRoleBadgeColor(user.role))}>
+                                <span className={cn("text-xs px-2 py-0.5 rounded-md", getRoleBadgeColor(user.role))}>
                                     {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                                 </span>
                             </div>
@@ -145,7 +139,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </aside>
 
             <div className="flex flex-1 flex-col">
-                <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm px-4 sm:px-6 shadow-sm">
+                <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 px-4 sm:px-6">
                     <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                         <SheetTrigger asChild>
                             <Button size="icon" variant="outline" className="sm:hidden">
@@ -153,17 +147,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <span className="sr-only">Toggle Menu</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="left" className="sm:max-w-xs bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                        <SheetContent side="left" className="sm:max-w-xs">
                             <nav className="grid gap-6 text-lg font-medium mt-6">
                                 <Link
-                                    href="#"
+                                    href="/dashboard"
                                     className="flex items-center gap-2 font-semibold"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                                        <span className="text-white font-bold">C</span>
+                                    <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                                        <span className="text-primary-foreground font-bold">C</span>
                                     </div>
-                                    <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                                        CRM Pro
+                                    <span className="text-lg font-semibold">
+                                        CYNERZA CRM
                                     </span>
                                 </Link>
                                 {filteredNavItems.map((item) => (
@@ -172,10 +166,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         href={item.href}
                                         onClick={() => setIsSidebarOpen(false)}
                                         className={cn(
-                                            "flex items-center gap-4 px-2.5 rounded-xl py-2 transition-all",
+                                            "flex items-center gap-4 px-2.5 rounded-md py-2 transition-colors text-base",
                                             pathname === item.href
-                                                ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
+                                                ? "bg-primary text-primary-foreground"
+                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                         )}
                                     >
                                         <item.icon className="h-5 w-5" />
@@ -193,7 +187,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src="" alt={user?.name || ""} />
-                                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                                             {user?.name?.charAt(0) || user?.email?.charAt(0) || "U"}
                                         </AvatarFallback>
                                     </Avatar>
@@ -206,7 +200,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         <p className="text-xs leading-none text-muted-foreground">
                                             {user?.email}
                                         </p>
-                                        <span className={cn("text-xs px-2 py-0.5 rounded-full w-fit mt-1", getRoleBadgeColor(user?.role || ''))}>
+                                        <span className={cn("text-xs px-2 py-0.5 rounded-md w-fit mt-1", getRoleBadgeColor(user?.role || ''))}>
                                             {user?.role?.charAt(0).toUpperCase()}{user?.role?.slice(1)}
                                         </span>
                                     </div>
@@ -221,7 +215,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+                <main className="flex-1 overflow-auto p-6">
                     {children}
                 </main>
             </div>
