@@ -6,6 +6,7 @@ import { DataTable } from "@/components/shared/DataTable";
 import { useLeads } from "@/hooks/useLeads";
 import { columns } from "./columns";
 import { CreateLeadDialog } from "./create-lead-dialog";
+import { ImportWizard } from "@/components/lead-import/ImportWizard";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -51,6 +52,9 @@ export default function LeadsPage() {
                                 <Download className="mr-2 h-4 w-4" />
                                 Export
                             </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="leads:create">
+                            <ImportWizard />
                         </PermissionGuard>
                         <PermissionGuard permission="leads:create">
                             <CreateLeadDialog />
