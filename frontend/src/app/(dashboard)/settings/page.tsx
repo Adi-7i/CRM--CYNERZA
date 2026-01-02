@@ -229,7 +229,7 @@ export default function SettingsPage() {
                                             <FormItem>
                                                 <FormLabel>Current Password</FormLabel>
                                                 <FormControl>
-                                                    <Input type="password" {...field} />
+                                                    <Input type="password" autoComplete="current-password" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -242,7 +242,7 @@ export default function SettingsPage() {
                                             <FormItem>
                                                 <FormLabel>New Password</FormLabel>
                                                 <FormControl>
-                                                    <Input type="password" {...field} />
+                                                    <Input type="password" autoComplete="new-password" {...field} />
                                                 </FormControl>
                                                 <FormDescription>
                                                     Password must be at least 8 characters.
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                                             <FormItem>
                                                 <FormLabel>Confirm New Password</FormLabel>
                                                 <FormControl>
-                                                    <Input type="password" {...field} />
+                                                    <Input type="password" autoComplete="new-password" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -368,9 +368,9 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 <h4 className="text-sm font-medium">Display Options</h4>
-                                <div className="grid gap-3">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-0.5">
+                                <div className="grid gap-4">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="space-y-0.5 flex-1">
                                             <Label htmlFor="compact-mode" className="text-sm font-normal">Compact Mode</Label>
                                             <p className="text-sm text-muted-foreground">
                                                 Show more content in less space.
@@ -378,8 +378,8 @@ export default function SettingsPage() {
                                         </div>
                                         <Switch id="compact-mode" />
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-0.5">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="space-y-0.5 flex-1">
                                             <Label htmlFor="show-avatars" className="text-sm font-normal">Show Avatars</Label>
                                             <p className="text-sm text-muted-foreground">
                                                 Display user avatars in lists and tables.

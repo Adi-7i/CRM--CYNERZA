@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Upload, X } from "lucide-react";
@@ -73,6 +73,9 @@ export function ImportWizard() {
                 <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                         <DialogTitle>Smart Lead Import</DialogTitle>
+                        <DialogDescription>
+                            Import leads from CSV or Excel files with automatic field mapping and duplicate detection.
+                        </DialogDescription>
                     </DialogHeader>
 
                     {/* Stepper */}

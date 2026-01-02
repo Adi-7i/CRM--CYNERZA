@@ -25,19 +25,19 @@ export function DealPipelineChart({ data }: DealPipelineChartProps) {
                 <XAxis
                     dataKey="stage"
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                     angle={-15}
                     textAnchor="end"
                     height={60}
                 />
                 <YAxis
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                 />
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
                         borderRadius: '6px'
                     }}
                     formatter={(value, name) => {
