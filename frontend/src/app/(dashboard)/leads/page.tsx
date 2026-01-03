@@ -53,6 +53,9 @@ export default function LeadsPage() {
                                 Export
                             </Button>
                         </PermissionGuard>
+                        <PermissionGuard permission="leads:import">
+                            <ImportWizard />
+                        </PermissionGuard>
                         <PermissionGuard permission="leads:create">
                             <ImportWizard />
                         </PermissionGuard>

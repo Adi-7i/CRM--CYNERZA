@@ -170,12 +170,12 @@ def convert_lead_to_customer_with_validation(
             detail=f"Lead already converted to customer (Customer ID: {existing_customer.id})"
         )
     
-    # Check if lead status is appropriate for conversion
-    # Typically convert qualified, proposal, or won leads
-    if lead.status not in [LeadStatus.QUALIFIED, LeadStatus.PROPOSAL, LeadStatus.WON]:
+    # Typically convert active leads (New, Contacted, Qualified, Proposal, Won)
+    # We restrict converting 'Lost' leads unless they are reactivated first
+    if lead.status == LeadStatus.LOST:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Cannot convert lead with status '{lead.status.value}'. Lead should be Qualified, Proposal, or Won."
+            detail=f"Cannot convert lead with status '{lead.status.value}'. Please reactivate the lead first."
         )
     
     # Perform conversion

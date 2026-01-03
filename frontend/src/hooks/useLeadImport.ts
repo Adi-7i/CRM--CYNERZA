@@ -99,15 +99,86 @@ export const useExecuteImport = () => {
     });
 };
 
-export const useImportSession = (sessionId: number) => {
+// ========== Session Management ==========
+
+export const useImportSession = (sessionId: number | null, enabled: boolean = true) => {
     return useQuery({
-        queryKey: ['lead-import', 'session', sessionId],
-        queryFn: () => leadImportService.getSession(sessionId),
-        enabled: !!sessionId,
-        refetchInterval: (query) => {
-            const data = query.state.data as ImportSession | undefined;
-            // Poll every 2 seconds while executing
-            return data?.status === 'executing' ? 2000 : false;
+        queryKey: ['import-session', sessionId],
+        queryFn: () => leadImportService.getSessionStatus(sessionId!),
+        enabled: enabled && !!sessionId,
+        refetchInterval: 5000, // Poll every 5 seconds for status updates
+        retry: false,
+    });
+};
+
+export const useDeleteSession = () => {
+    return useMutation({
+        mutationFn: (sessionId: number) => leadImportService.deleteSession(sessionId),
+        onSuccess: () => {
+            toast.success('Import session deleted');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || 'Failed to delete session');
+        },
+    });
+};
+
+// ========== Templates ==========
+
+export const useImportTemplates = () => {
+    return useQuery({
+        queryKey: ['import-templates'],
+        queryFn: () => leadImportService.listTemplates(),
+    });
+};
+
+export const useCreateTemplate = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data: TemplateCreate) => leadImportService.createTemplate(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['import-templates'] });
+            toast.success('Template saved successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || 'Failed to save template');
+        },
+    });
+};
+
+export const useUpdateTemplate = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({
+            templateId,
+            data,
+        }: {
+            templateId: number;
+            data: TemplateUpdate;
+        }) => leadImportService.updateTemplate(templateId, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['import-templates'] });
+            toast.success('Template updated successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || 'Failed to update template');
+        },
+    });
+};
+
+export const useDeleteTemplate = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (templateId: number) => leadImportService.deleteTemplate(templateId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['import-templates'] });
+            toast.success('Template deleted successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || 'Failed to delete template');
         },
     });
 };

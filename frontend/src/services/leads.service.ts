@@ -1,5 +1,5 @@
 import api from './api';
-import { Lead, CreateLeadDTO, UpdateLeadDTO } from '@/types/leads';
+import { Lead, CreateLeadDTO, UpdateLeadDTO, LeadImportResponse } from '@/types/leads';
 
 interface LeadListResponse {
     total: number;
@@ -71,6 +71,13 @@ export const leadsService = {
 
     async addNote(id: number, note_text: string): Promise<LeadNote> {
         const response = await api.post<LeadNote>(`/leads/${id}/notes`, { note_text });
+        return response.data;
+    },
+
+    async importLeads(file: File): Promise<LeadImportResponse> {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await api.post<LeadImportResponse>('/leads/import', formData);
         return response.data;
     }
 };

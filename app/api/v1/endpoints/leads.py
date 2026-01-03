@@ -26,6 +26,7 @@ from app.services import lead_service
 router = APIRouter()
 
 
+
 @router.post("/", response_model=LeadResponse, status_code=status.HTTP_201_CREATED)
 def create_lead(
     lead_in: LeadCreate,

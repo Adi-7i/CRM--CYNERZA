@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
     const { register } = useAuth();
-    const [name, setName] = useState("");
+    const [full_name, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -48,8 +48,8 @@ export default function RegisterPage() {
                             id="name"
                             type="text"
                             placeholder="John Doe"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={full_name}
+                            onChange={(e) => setFullName(e.target.value)}
                             required
                         />
                     </div>

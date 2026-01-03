@@ -111,3 +111,18 @@ export const useUpdateLeadStatus = () => {
         },
     });
 };
+
+export const useLeadImport = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (file: File) => leadsService.importLeads(file),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['leads'] });
+        },
+        onError: (error: any) => {
+            // We handle specific errors in the UI, but generic ones can be toasted
+            toast.error(error.response?.data?.detail || 'Failed to import leads');
+        },
+    });
+};

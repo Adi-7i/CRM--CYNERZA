@@ -50,11 +50,13 @@ export function UploadStep({ onComplete }: UploadStepProps) {
             !selectedFile.name.endsWith('.csv') &&
             !selectedFile.name.endsWith('.xlsx')) {
             toast.error('Invalid file type. Please upload a CSV or Excel file.');
+            alert('Please upload a CSV or Excel file');
             return;
         }
 
         if (selectedFile.size > 5 * 1024 * 1024) {
             toast.error('File size must be less than 5MB');
+            alert('File size must be less than 5MB');
             return;
         }
 
