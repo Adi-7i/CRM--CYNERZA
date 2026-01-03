@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.logging_config import setup_logging, get_logger
 from app.core.error_handlers import register_exception_handlers
 from app.middleware.logging_middleware import RequestLoggingMiddleware
-from app.api.v1.endpoints import users, auth, leads, customers, deals, tasks, analytics, health
+from app.api.v1.endpoints import users, auth, leads, customers, deals, tasks, analytics, health, lead_import
 from app.models.base import Base
 from app.core.database import engine
 
@@ -157,6 +157,13 @@ app.include_router(
     analytics.router,
     prefix=f"{settings.API_V1_STR}/analytics",
     tags=["analytics"]
+)
+
+# Lead Import routes
+app.include_router(
+    lead_import.router,
+    prefix=f"{settings.API_V1_STR}/leads/import",
+    tags=["leads"]
 )
 
 

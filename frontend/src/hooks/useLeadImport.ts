@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import axios from 'axios';
+import api from '@/services/api';
 import {
     UploadAnalysisResponse,
     MappingSubmission,
@@ -10,40 +10,38 @@ import {
     ImportSession,
 } from '@/types/lead-import';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-
 // API Service
 const leadImportService = {
     uploadFile: async (file: File): Promise<UploadAnalysisResponse> => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await axios.post(`${API_URL}/leads/import/upload`, formData, {
+        const response = await api.post('/leads/import/upload', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
         return response.data;
     },
 
     submitMapping: async (sessionId: number, data: MappingSubmission): Promise<void> => {
-        await axios.post(`${API_URL}/leads/import/${sessionId}/mapping`, data);
+        await api.post(`/leads/import/${sessionId}/mapping`, data);
     },
 
     getPreview: async (sessionId: number): Promise<PreviewResponse> => {
-        const response = await axios.get(`${API_URL}/leads/import/${sessionId}/preview`);
+        const response = await api.get(`/leads/import/${sessionId}/preview`);
         return response.data;
     },
 
     getDuplicates: async (sessionId: number): Promise<DuplicatesResponse> => {
-        const response = await axios.get(`${API_URL}/leads/import/${sessionId}/duplicates`);
+        const response = await api.get(`/leads/import/${sessionId}/duplicates`);
         return response.data;
     },
 
     executeImport: async (sessionId: number, request: ExecuteImportRequest): Promise<void> => {
-        await axios.post(`${API_URL}/leads/import/${sessionId}/execute`, request);
+        await api.post(`/leads/import/${sessionId}/execute`, request);
     },
 
     getSession: async (sessionId: number): Promise<ImportSession> => {
-        const response = await axios.get(`${API_URL}/leads/import/sessions/${sessionId}`);
+        const response = await api.get(`/leads/import/sessions/${sessionId}`);
         return response.data;
     },
 };
