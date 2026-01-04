@@ -29,16 +29,16 @@ export function LeadsOverviewChart({ data }: LeadsOverviewChartProps) {
                 <XAxis
                     dataKey="date"
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                 />
                 <YAxis
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                 />
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
                         borderRadius: '6px'
                     }}
                 />

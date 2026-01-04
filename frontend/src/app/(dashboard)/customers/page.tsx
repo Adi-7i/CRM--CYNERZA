@@ -16,14 +16,14 @@ export default function CustomersPage() {
     const { data: customers, isLoading } = useCustomers(search || undefined);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             <PageHeader
                 title="Customers"
                 description="Manage your customer relationships and track interactions."
                 action={
                     <div className="flex gap-2">
                         <PermissionGuard permission="customers:export">
-                            <Button variant="outline">
+                            <Button variant="outline" size="sm">
                                 <Download className="mr-2 h-4 w-4" />
                                 Export
                             </Button>
@@ -36,9 +36,9 @@ export default function CustomersPage() {
             />
 
             {/* Search */}
-            <div className="flex gap-4">
+            <div className="flex gap-3">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search by name, email, or company..."
                         value={search}

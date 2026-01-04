@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Users, CreditCard, TrendingUp, ArrowUpRight } from "lucide-react";
+import { TrendingUp, Users, CreditCard, DollarSign, ArrowUpRight } from "lucide-react";
 import { ChartCard } from "@/components/shared/ChartCard";
 import { ChartSkeleton } from "@/components/shared/ChartSkeleton";
 import { LeadsOverviewChart } from "@/components/charts/LeadsOverviewChart";
@@ -17,69 +17,63 @@ export default function DashboardPage() {
         {
             title: "Total Revenue",
             value: `$${analytics?.summary.total_revenue.toLocaleString() || '0'}`,
-            change: "+20.1%",
+            change: "+20.1% from last month",
             icon: DollarSign,
-            gradient: "from-purple-500 to-pink-500",
-            bgGradient: "bg-gradient-to-br from-purple-50 to-pink-50",
+            iconBg: "bg-primary/10",
+            iconColor: "text-primary",
         },
         {
             title: "Total Customers",
             value: analytics?.summary.total_customers || 0,
             change: `+${analytics?.summary.total_leads || 0} leads`,
             icon: Users,
-            gradient: "from-blue-500 to-cyan-500",
-            bgGradient: "bg-gradient-to-br from-blue-50 to-cyan-50",
+            iconBg: "bg-blue-500/10",
+            iconColor: "text-blue-600",
         },
         {
             title: "Active Deals",
             value: analytics?.summary.total_deals || 0,
             change: "In pipeline",
             icon: CreditCard,
-            gradient: "from-green-500 to-emerald-500",
-            bgGradient: "bg-gradient-to-br from-green-50 to-emerald-50",
+            iconBg: "bg-green-500/10",
+            iconColor: "text-green-600",
         },
         {
             title: "Conversion Rate",
             value: `${analytics?.summary.conversion_rate.toFixed(1) || '0'}%`,
             change: "Lead to customer",
             icon: TrendingUp,
-            gradient: "from-orange-500 to-red-500",
-            bgGradient: "bg-gradient-to-br from-orange-50 to-red-50",
+            iconBg: "bg-orange-500/10",
+            iconColor: "text-orange-600",
         },
     ];
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-content">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                        Dashboard
-                    </h2>
-                    <p className="text-muted-foreground mt-1">
-                        Welcome back! Here's what's happening with your business today.
-                    </p>
-                </div>
+            <div>
+                <h2 className="text-3xl font-semibold tracking-tight">
+                    Dashboard
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                    Welcome back! Here's what's happening with your business today.
+                </p>
             </div>
 
             {/* Stats Cards */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, index) => (
-                    <Card
-                        key={index}
-                        className="relative overflow-hidden border-0 shadow-lg hover-lift group"
-                    >
-                        <div className={`absolute inset-0 ${stat.bgGradient} opacity-50`} />
-                        <CardHeader className="relative flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-700">
+                    <Card key={index} className="card-clean">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
                                 {stat.title}
                             </CardTitle>
-                            <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
-                                <stat.icon className="h-4 w-4 text-white" />
+                            <div className={`p-2 rounded-md ${stat.iconBg}`}>
+                                <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
                             </div>
                         </CardHeader>
-                        <CardContent className="relative">
-                            <div className="text-3xl font-bold text-gray-900">
+                        <CardContent>
+                            <div className="text-2xl font-semibold">
                                 {stat.value}
                             </div>
                             <div className="flex items-center gap-1 mt-1">
@@ -95,7 +89,7 @@ export default function DashboardPage() {
 
             {/* Error State */}
             {isError && (
-                <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl shadow-sm">
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
                     ⚠️ Failed to load analytics data. Please try again later.
                 </div>
             )}

@@ -75,7 +75,6 @@ Use `/api/v1/auth/login` to obtain access tokens.
         {"name": "authentication", "description": "User authentication and token management"},
         {"name": "users", "description": "User management (admin only)"},
         {"name": "leads", "description": "Lead management and tracking"},
-        {"name": "lead-import", "description": "Smart lead import with mapping and deduplication"},
         {"name": "customers", "description": "Customer management and interactions"},
         {"name": "deals", "description": "Deal/Opportunity pipeline management"},
         {"name": "tasks", "description": "Task and follow-up management"},
@@ -160,11 +159,11 @@ app.include_router(
     tags=["analytics"]
 )
 
-# Smart Lead Import routes
+# Lead Import routes
 app.include_router(
     lead_import.router,
     prefix=f"{settings.API_V1_STR}/leads/import",
-    tags=["lead-import"]
+    tags=["leads"]
 )
 
 

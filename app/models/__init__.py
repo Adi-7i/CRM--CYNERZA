@@ -7,8 +7,7 @@ from app.models.lead import Lead, LeadNote, LeadStatus, LeadSource
 from app.models.customer import Customer, CustomerInteraction, InteractionType
 from app.models.deal import Deal, DealStage
 from app.models.task import Task, TaskPriority, TaskStatus, RelatedEntityType
-from app.models.import_session import ImportSession, ImportStatus
-from app.models.mapping_template import MappingTemplate
+from app.models.import_session import ImportSession, ImportSessionStatus
 
 # Export all models for easy importing
 __all__ = [
@@ -17,6 +16,6 @@ __all__ = [
     "Customer", "CustomerInteraction", "InteractionType",
     "Deal", "DealStage",
     "Task", "TaskPriority", "TaskStatus", "RelatedEntityType",
-    "ImportSession", "ImportStatus",
-    "MappingTemplate"
+    "ImportSession", "ImportSessionStatus"
 ]
+

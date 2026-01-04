@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useUploadFile } from "@/hooks/useLeadImport";
 import { UploadAnalysisResponse } from "@/types/lead-import";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface UploadStepProps {
     onComplete: (data: UploadAnalysisResponse) => void;
@@ -48,16 +49,19 @@ export function UploadStep({ onComplete }: UploadStepProps) {
         if (!validTypes.includes(selectedFile.type) &&
             !selectedFile.name.endsWith('.csv') &&
             !selectedFile.name.endsWith('.xlsx')) {
+            toast.error('Invalid file type. Please upload a CSV or Excel file.');
             alert('Please upload a CSV or Excel file');
             return;
         }
 
         if (selectedFile.size > 5 * 1024 * 1024) {
+            toast.error('File size must be less than 5MB');
             alert('File size must be less than 5MB');
             return;
         }
 
         setFile(selectedFile);
+        toast.success(`File selected: ${selectedFile.name}`);
     };
 
     const handleUpload = () => {
@@ -65,13 +69,14 @@ export function UploadStep({ onComplete }: UploadStepProps) {
 
         uploadFile(file, {
             onSuccess: (data) => {
+                toast.success('File analyzed successfully!');
                 onComplete(data);
             },
         });
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             <div className="text-center space-y-2">
                 <h3 className="text-lg font-semibold">Upload Lead File</h3>
                 <p className="text-sm text-muted-foreground">
@@ -94,8 +99,8 @@ export function UploadStep({ onComplete }: UploadStepProps) {
                 onDrop={handleDrop}
             >
                 <div className="flex flex-col items-center gap-4">
-                    <div className="p-4 bg-muted rounded-full">
-                        <FileSpreadsheet className="h-10 w-10 text-muted-foreground" />
+                    <div className="p-4 bg-primary/10 rounded-full">
+                        <FileSpreadsheet className="h-10 w-10 text-primary" />
                     </div>
 
                     <div className="space-y-2">

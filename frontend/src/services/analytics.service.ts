@@ -89,14 +89,13 @@ export const analyticsService = {
                 lost: 0
             }));
 
-        // Map Deal Pipeline
-        const dealPipeline: DealPipelineData[] = Object.entries(deals.stage_distribution).map(([stage, count]) => ({
+        // Map Deal Pipeline - ensure all stages are included
+        const allStages = ['Prospecting', 'Qualification', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
+        const dealPipeline: DealPipelineData[] = allStages.map(stage => ({
             stage,
-            count,
+            count: Number(deals.stage_distribution[stage] || 0),
             value: Number(deals.stage_value_distribution[stage] || 0)
         }));
-
-        // Verify stage order or sort if needed (optional)
 
         // Map Revenue Trend
         const revenueTrend: RevenueData[] = Object.entries(deals.monthly_revenue)

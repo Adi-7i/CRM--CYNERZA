@@ -10,11 +10,18 @@ export default function DealsPage() {
     const { data: deals, isLoading, isError } = useDeals();
 
     if (isError) {
-        return <div>Error loading deals.</div>;
+        return (
+            <div className="space-y-content">
+                <PageHeader title="Deals" description="Manage your sales pipeline." />
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
+                    ⚠️ Error loading deals. Please try again later.
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             <PageHeader title="Deals" description="Manage your sales pipeline.">
                 <CreateDealDialog />
             </PageHeader>

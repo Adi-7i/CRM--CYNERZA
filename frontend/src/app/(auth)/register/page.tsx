@@ -22,7 +22,7 @@ export default function RegisterPage() {
         setIsLoading(true);
         setError("");
         try {
-            await register({ full_name, email, password });
+            await register({ full_name: name, email, password });
         } catch (err: any) {
             if (err.response) {
                 setError(err.response.data.detail || "Registration failed");

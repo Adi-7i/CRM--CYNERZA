@@ -53,7 +53,7 @@ export const leadsService = {
 
     // Status update
     async updateStatus(id: number, status: string): Promise<Lead> {
-        const response = await api.patch<Lead>(`/leads/${id}/status`, { status });
+        const response = await api.put<Lead>(`/leads/${id}/status`, { status });
         return response.data;
     },
 
