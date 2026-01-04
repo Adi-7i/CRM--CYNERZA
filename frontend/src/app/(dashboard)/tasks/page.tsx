@@ -10,11 +10,18 @@ export default function TasksPage() {
     const { data: tasks, isLoading, isError } = useTasks();
 
     if (isError) {
-        return <div>Error loading tasks.</div>;
+        return (
+            <div className="space-y-content">
+                <PageHeader title="Tasks" description="Manage your daily tasks." />
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
+                    ⚠️ Error loading tasks. Please try again later.
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             <PageHeader title="Tasks" description="Manage your daily tasks.">
                 <CreateTaskDialog />
             </PageHeader>

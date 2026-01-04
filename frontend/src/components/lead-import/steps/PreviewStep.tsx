@@ -38,7 +38,7 @@ export function PreviewStep({ sessionId, onComplete, onBack }: PreviewStepProps)
     const hasErrors = preview.invalid_count > 0;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             <div>
                 <h3 className="text-lg font-semibold">Preview Normalized Data</h3>
                 <p className="text-sm text-muted-foreground">

@@ -169,14 +169,14 @@ export function CreateTaskDialog() {
                             <div className="grid gap-2">
                                 <Label htmlFor="related_type">Related To</Label>
                                 <Select
-                                    value={formData.related_type}
-                                    onValueChange={(val) => setFormData({ ...formData, related_type: val })}
+                                    value={formData.related_type || "none"}
+                                    onValueChange={(val) => setFormData({ ...formData, related_type: val === "none" ? "" : val })}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">None</SelectItem>
+                                        <SelectItem value="none">None</SelectItem>
                                         <SelectItem value="Lead">Lead</SelectItem>
                                         <SelectItem value="Customer">Customer</SelectItem>
                                         <SelectItem value="Deal">Deal</SelectItem>

@@ -7,26 +7,37 @@ interface DealPipelineChartProps {
     data: DealPipelineData[];
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+// Stage-specific colors for better visual distinction
+const STAGE_COLORS: Record<string, string> = {
+    'Prospecting': '#3b82f6',      // Blue
+    'Qualification': '#8b5cf6',    // Purple
+    'Proposal': '#10b981',          // Green
+    'Negotiation': '#f59e0b',       // Amber
+    'Closed Won': '#22c55e',        // Success green
+    'Closed Lost': '#ef4444'        // Red
+};
 
 export function DealPipelineChart({ data }: DealPipelineChartProps) {
     return (
         <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data}>
+            <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis
                     dataKey="stage"
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
+                    angle={-15}
+                    textAnchor="end"
+                    height={60}
                 />
                 <YAxis
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                 />
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
                         borderRadius: '6px'
                     }}
                     formatter={(value, name) => {
@@ -39,7 +50,10 @@ export function DealPipelineChart({ data }: DealPipelineChartProps) {
                 />
                 <Bar dataKey="count" name="count" radius={[8, 8, 0, 0]}>
                     {data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                            key={`cell-${index}`}
+                            fill={STAGE_COLORS[entry.stage] || '#6366f1'}
+                        />
                     ))}
                 </Bar>
             </BarChart>

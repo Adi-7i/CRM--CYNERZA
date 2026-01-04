@@ -12,11 +12,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Trash2, ArrowRight } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowRight, Eye, Pencil } from "lucide-react";
 import { useDeleteLead } from "@/hooks/useLeads";
 import { usePermission } from "@/hooks/usePermission";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ConvertLeadDialog } from "./convert-lead-dialog";
+import { EditLeadDialog } from "./edit-lead-dialog";
 
 const statusColors: Record<string, string> = {
     "New": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -36,9 +38,11 @@ const sourceColors: Record<string, string> = {
 };
 
 function LeadActions({ lead }: { lead: Lead }) {
+    const router = useRouter();
     const deleteLead = useDeleteLead();
     const { can } = usePermission();
     const [convertOpen, setConvertOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this lead?')) {
@@ -46,13 +50,13 @@ function LeadActions({ lead }: { lead: Lead }) {
         }
     };
 
+    const handleView = () => {
+        router.push(`/leads/${lead.id}`);
+    };
+
     const canConvert = can('leads:convert') && lead.status !== 'Won' && lead.status !== 'Lost';
     const canDelete = can('leads:delete');
-
-    // If user has no actions available, don't show the menu
-    if (!canConvert && !canDelete) {
-        return null;
-    }
+    const canEdit = can('leads:edit');
 
     return (
         <>
@@ -66,6 +70,16 @@ function LeadActions({ lead }: { lead: Lead }) {
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleView}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Details
+                    </DropdownMenuItem>
+                    {canEdit && (
+                        <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                        </DropdownMenuItem>
+                    )}
                     {canConvert && (
                         <DropdownMenuItem onClick={() => setConvertOpen(true)}>
                             <ArrowRight className="mr-2 h-4 w-4 text-green-600" />
@@ -73,14 +87,18 @@ function LeadActions({ lead }: { lead: Lead }) {
                         </DropdownMenuItem>
                     )}
                     {canDelete && (
-                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
+                        <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                            </DropdownMenuItem>
+                        </>
                     )}
                 </DropdownMenuContent>
             </DropdownMenu>
             <ConvertLeadDialog lead={lead} open={convertOpen} onOpenChange={setConvertOpen} />
+            <EditLeadDialog lead={lead} open={editOpen} onOpenChange={setEditOpen} />
         </>
     );
 }

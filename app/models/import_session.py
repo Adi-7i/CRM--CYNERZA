@@ -1,203 +1,109 @@
 """
 ImportSession model for tracking lead import operations.
-Stores the state and data for each phase of the import workflow.
 """
-import enum
-from sqlalchemy import Column, String, Integer, ForeignKey, Enum, Text, LargeBinary
-from sqlalchemy.dialects.sqlite import JSON
+from sqlalchemy import Column, String, Enum, Integer, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
+import enum
 
 from app.models.base import BaseModel
 
 
-class ImportStatus(str, enum.Enum):
-    """Status of the import session."""
+class ImportSessionStatus(str, enum.Enum):
+    """Status of an import session."""
+    PENDING = "pending"
     ANALYZING = "analyzing"
     MAPPING = "mapping"
-    NORMALIZING = "normalizing"
-    DEDUPLICATING = "deduplicating"
-    READY = "ready"
+    PREVIEWING = "previewing"
+    EXECUTING = "executing"
     COMPLETED = "completed"
     FAILED = "failed"
 
 
 class ImportSession(BaseModel):
     """
-    Tracks the state of a lead import operation.
-    Each import goes through multiple phases before completion.
+    ImportSession model for tracking bulk lead imports.
     
-    Workflow:
-    1. ANALYZING: File uploaded, detecting columns
-    2. MAPPING: Waiting for user to map columns
-    3. NORMALIZING: Cleaning and validating data
-    4. DEDUPLICATING: Finding duplicates
-    5. READY: Waiting for user to resolve duplicates
-    6. COMPLETED: Import finished successfully
-    7. FAILED: Import failed with error
+    Fields:
+        status: Current status of the import session
+        file_name: Original uploaded file name
+        total_rows: Total number of rows in the file
+        valid_rows: Number of valid rows after validation
+        imported_count: Number of successfully imported leads
+        error_message: Error message if failed
+        detected_columns: JSON list of detected column names
+        column_mappings: JSON mapping of file columns to CRM fields
+        file_data: JSON storage of parsed file data
+        user_id: User who initiated the import
     """
     __tablename__ = "import_sessions"
     
-    # Session identification
-    user_id = Column(
-        Integer,
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-        comment="User who initiated the import"
-    )
-    
-    # Status tracking
     status = Column(
-        Enum(ImportStatus),
-        default=ImportStatus.ANALYZING,
+        Enum(ImportSessionStatus),
         nullable=False,
-        index=True,
-        comment="Current status of the import session"
+        default=ImportSessionStatus.PENDING,
+        comment="Current import status"
     )
     
-    error_message = Column(
-        Text,
-        nullable=True,
-        comment="Error message if status is FAILED"
-    )
-    
-    # File information
     file_name = Column(
         String(255),
-        nullable=False,
-        comment="Original filename"
-    )
-    
-    file_data = Column(
-        LargeBinary,
         nullable=True,
-        comment="Stored file content for reprocessing"
+        comment="Original file name"
     )
     
-    # Phase 1: Analysis results
-    detected_columns = Column(
-        JSON,
-        nullable=True,
-        default=list,
-        comment="List of detected column headers from file"
-    )
-    
-    suggested_mappings = Column(
-        JSON,
-        nullable=True,
-        default=dict,
-        comment="Auto-detected column to field mappings"
-    )
-    
-    sample_rows = Column(
-        JSON,
-        nullable=True,
-        default=list,
-        comment="5 sample rows for preview"
-    )
-    
-    # Phase 2: User mappings
-    user_mappings = Column(
-        JSON,
-        nullable=True,
-        default=dict,
-        comment="User-confirmed column to field mappings"
-    )
-    
-    merge_rules = Column(
-        JSON,
-        nullable=True,
-        default=list,
-        comment="Rules for merging columns (e.g., first+last name)"
-    )
-    
-    ignored_columns = Column(
-        JSON,
-        nullable=True,
-        default=list,
-        comment="Columns marked to ignore"
-    )
-    
-    # Phase 3: Normalized data
     total_rows = Column(
         Integer,
+        nullable=True,
         default=0,
         comment="Total rows in file"
     )
     
     valid_rows = Column(
         Integer,
+        nullable=True,
         default=0,
-        comment="Rows that passed validation"
+        comment="Valid rows after validation"
     )
     
-    normalized_data = Column(
-        JSON,
+    imported_count = Column(
+        Integer,
         nullable=True,
-        default=list,
-        comment="Cleaned data after normalization"
+        default=0,
+        comment="Successfully imported leads"
     )
     
-    validation_errors = Column(
-        JSON,
+    error_message = Column(
+        Text,
         nullable=True,
-        default=list,
-        comment="Rows that failed validation with reasons"
+        comment="Error message if failed"
     )
     
-    # Phase 4: Duplicate detection
-    in_file_duplicates = Column(
+    detected_columns = Column(
         JSON,
         nullable=True,
-        default=list,
-        comment="Duplicates found within the file"
+        comment="Detected column names from file"
     )
     
-    existing_duplicates = Column(
+    column_mappings = Column(
         JSON,
         nullable=True,
-        default=list,
-        comment="Matches with existing CRM leads"
+        comment="Column to CRM field mappings"
     )
     
-    smart_matches = Column(
+    file_data = Column(
         JSON,
         nullable=True,
-        default=list,
-        comment="Fuzzy matches (same company + similar name)"
+        comment="Parsed file data as JSON"
     )
     
-    # Phase 5: Import results
-    duplicate_decisions = Column(
-        JSON,
-        nullable=True,
-        default=dict,
-        comment="User decisions for each duplicate: skip/update/insert"
-    )
-    
-    import_result = Column(
-        JSON,
-        nullable=True,
-        default=dict,
-        comment="Final import summary with counts"
-    )
-    
-    inserted_lead_ids = Column(
-        JSON,
-        nullable=True,
-        default=list,
-        comment="IDs of newly created leads"
-    )
-    
-    updated_lead_ids = Column(
-        JSON,
-        nullable=True,
-        default=list,
-        comment="IDs of updated leads"
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="User who initiated import"
     )
     
     # Relationships
     user = relationship("User", backref="import_sessions")
     
     def __repr__(self):
-        return f"<ImportSession(id={self.id}, status={self.status}, file={self.file_name})>"
+        return f"<ImportSession(id={self.id}, status={self.status})>"

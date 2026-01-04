@@ -37,7 +37,7 @@ export function SummaryStep({ sessionId, onClose, onRestart }: SummaryStepProps)
     const hasFailed = session.status === 'failed';
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             {isCompleted ? (
                 <>
                     {/* Success Animation */}

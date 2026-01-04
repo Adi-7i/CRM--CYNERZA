@@ -1,79 +1,97 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { leadImportService } from '@/services/lead-import.service';
-import {
-    MappingSubmission,
-    ExecuteImportRequest,
-    TemplateCreate,
-    TemplateUpdate,
-} from '@/types/lead-import';
 import { toast } from 'sonner';
+import api from '@/services/api';
+import {
+    UploadAnalysisResponse,
+    MappingSubmission,
+    PreviewResponse,
+    DuplicatesResponse,
+    ExecuteImportRequest,
+    ImportSession,
+} from '@/types/lead-import';
 
-// ========== Phase 1: Upload & Analyze ==========
+// API Service
+const leadImportService = {
+    uploadFile: async (file: File): Promise<UploadAnalysisResponse> => {
+        const formData = new FormData();
+        formData.append('file', file);
 
+        const response = await api.post('/leads/import/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data;
+    },
+
+    submitMapping: async (sessionId: number, data: MappingSubmission): Promise<void> => {
+        await api.post(`/leads/import/${sessionId}/mapping`, data);
+    },
+
+    getPreview: async (sessionId: number): Promise<PreviewResponse> => {
+        const response = await api.get(`/leads/import/${sessionId}/preview`);
+        return response.data;
+    },
+
+    getDuplicates: async (sessionId: number): Promise<DuplicatesResponse> => {
+        const response = await api.get(`/leads/import/${sessionId}/duplicates`);
+        return response.data;
+    },
+
+    executeImport: async (sessionId: number, request: ExecuteImportRequest): Promise<void> => {
+        await api.post(`/leads/import/${sessionId}/execute`, request);
+    },
+
+    getSession: async (sessionId: number): Promise<ImportSession> => {
+        const response = await api.get(`/leads/import/sessions/${sessionId}`);
+        return response.data;
+    },
+};
+
+// Hooks
 export const useUploadFile = () => {
     return useMutation({
-        mutationFn: (file: File) => leadImportService.uploadAndAnalyze(file),
+        mutationFn: leadImportService.uploadFile,
         onError: (error: any) => {
             toast.error(error.response?.data?.detail || 'Failed to upload file');
         },
     });
 };
 
-// ========== Phase 2: Submit Mapping ==========
-
 export const useSubmitMapping = () => {
     return useMutation({
-        mutationFn: ({
-            sessionId,
-            mappingData,
-        }: {
-            sessionId: number;
-            mappingData: MappingSubmission;
-        }) => leadImportService.submitMapping(sessionId, mappingData),
+        mutationFn: ({ sessionId, mappingData }: { sessionId: number; mappingData: MappingSubmission }) =>
+            leadImportService.submitMapping(sessionId, mappingData),
         onError: (error: any) => {
             toast.error(error.response?.data?.detail || 'Failed to submit mapping');
         },
     });
 };
 
-// ========== Phase 3: Get Preview ==========
-
-export const useImportPreview = (sessionId: number | null, enabled: boolean = true) => {
+export const useImportPreview = (sessionId: number) => {
     return useQuery({
-        queryKey: ['import-preview', sessionId],
-        queryFn: () => leadImportService.getPreview(sessionId!),
-        enabled: enabled && !!sessionId,
-        retry: false,
+        queryKey: ['lead-import', 'preview', sessionId],
+        queryFn: () => leadImportService.getPreview(sessionId),
+        enabled: !!sessionId,
     });
 };
 
-// ========== Phase 4: Get Duplicates ==========
-
-export const useImportDuplicates = (sessionId: number | null, enabled: boolean = true) => {
+export const useImportDuplicates = (sessionId: number) => {
     return useQuery({
-        queryKey: ['import-duplicates', sessionId],
-        queryFn: () => leadImportService.getDuplicates(sessionId!),
-        enabled: enabled && !!sessionId,
-        retry: false,
+        queryKey: ['lead-import', 'duplicates', sessionId],
+        queryFn: () => leadImportService.getDuplicates(sessionId),
+        enabled: !!sessionId,
     });
 };
-
-// ========== Phase 5: Execute Import ==========
 
 export const useExecuteImport = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({
-            sessionId,
-            request,
-        }: {
-            sessionId: number;
-            request: ExecuteImportRequest;
-        }) => leadImportService.executeImport(sessionId, request),
-        onSuccess: () => {
-            // Invalidate leads list to show new imports
+        mutationFn: ({ sessionId, request }: { sessionId: number; request: ExecuteImportRequest }) =>
+            leadImportService.executeImport(sessionId, request),
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['leads'] });
+            queryClient.invalidateQueries({ queryKey: ['lead-import', 'session', variables.sessionId] });
+            toast.success('Import completed successfully');
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.detail || 'Failed to execute import');

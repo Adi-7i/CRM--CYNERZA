@@ -41,19 +41,22 @@ export default function LeadsPage() {
     const hasFilters = search || status || source;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-content">
             <PageHeader
                 title="Leads"
                 description="Manage your sales leads and track their progress through the pipeline."
                 action={
                     <div className="flex gap-2">
                         <PermissionGuard permission="leads:export">
-                            <Button variant="outline">
+                            <Button variant="outline" size="sm">
                                 <Download className="mr-2 h-4 w-4" />
                                 Export
                             </Button>
                         </PermissionGuard>
                         <PermissionGuard permission="leads:import">
+                            <ImportWizard />
+                        </PermissionGuard>
+                        <PermissionGuard permission="leads:create">
                             <ImportWizard />
                         </PermissionGuard>
                         <PermissionGuard permission="leads:create">
@@ -64,9 +67,9 @@ export default function LeadsPage() {
             />
 
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search by name or email..."
                         value={search}

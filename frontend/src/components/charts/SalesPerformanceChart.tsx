@@ -15,19 +15,19 @@ export function SalesPerformanceChart({ data }: SalesPerformanceChartProps) {
                 <XAxis
                     type="number"
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                 />
                 <YAxis
                     type="category"
                     dataKey="name"
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'var(--muted-foreground)' }}
                     width={100}
                 />
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
                         borderRadius: '6px'
                     }}
                     formatter={(value, name) => {

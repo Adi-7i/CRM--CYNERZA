@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UploadStep } from "./steps/UploadStep";
@@ -34,9 +35,11 @@ export function ImportWizard() {
         setAnalysisData(null);
     };
 
-    const handleClose = () => {
-        setOpen(false);
-        setTimeout(handleReset, 300); // Reset after dialog closes
+    const handleOpenChange = (newOpen: boolean) => {
+        setOpen(newOpen);
+        if (!newOpen) {
+            setTimeout(handleReset, 300); // Reset after dialog closes
+        }
     };
 
     const handleUploadComplete = (data: UploadAnalysisResponse) => {
@@ -61,25 +64,18 @@ export function ImportWizard() {
 
     return (
         <>
-            <Button variant="outline" className="gap-2" onClick={() => setOpen(true)}>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setOpen(true)}>
                 <Upload className="h-4 w-4" />
                 Smart Import
             </Button>
 
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
                 <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
                     <DialogHeader>
-                        <div className="flex items-center justify-between">
-                            <DialogTitle>Smart Lead Import</DialogTitle>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleClose}
-                                className="h-6 w-6"
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
+                        <DialogTitle>Smart Lead Import</DialogTitle>
+                        <DialogDescription>
+                            Import leads from CSV or Excel files with automatic field mapping and duplicate detection.
+                        </DialogDescription>
                     </DialogHeader>
 
                     {/* Stepper */}
@@ -89,7 +85,7 @@ export function ImportWizard() {
                                 <div className="flex flex-col items-center flex-1">
                                     <div
                                         className={cn(
-                                            "w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm transition-colors",
+                                            "w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm transition-colors relative",
                                             index < currentStepIndex
                                                 ? "bg-primary text-primary-foreground"
                                                 : index === currentStepIndex
@@ -98,6 +94,14 @@ export function ImportWizard() {
                                         )}
                                     >
                                         {step.number}
+                                        {index === currentStepIndex && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="absolute -top-2 -right-2 h-5 px-1.5 text-xs"
+                                            >
+                                                Active
+                                            </Badge>
+                                        )}
                                     </div>
                                     <span
                                         className={cn(
@@ -152,7 +156,7 @@ export function ImportWizard() {
                         {currentStep === 'summary' && sessionId && (
                             <SummaryStep
                                 sessionId={sessionId}
-                                onClose={handleClose}
+                                onClose={() => handleOpenChange(false)}
                                 onRestart={handleReset}
                             />
                         )}

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileX } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -50,7 +50,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <div className="space-y-4">
-            <div className="rounded-md border">
+            <div className="rounded-lg border bg-card">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -75,7 +75,7 @@ export function DataTable<TData, TValue>({
                             Array.from({ length: 5 }).map((_, i) => (
                                 <TableRow key={i}>
                                     {columns.map((col, j) => (
-                                        <TableCell key={j}><Skeleton className="h-6 w-full" /></TableCell>
+                                        <TableCell key={j}><Skeleton className="h-5 w-full" /></TableCell>
                                     ))}
                                 </TableRow>
                             ))
@@ -99,33 +99,46 @@ export function DataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    className="h-32 text-center"
                                 >
-                                    No results.
+                                    <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                                        <FileX className="h-8 w-8" />
+                                        <p className="text-sm">No results found.</p>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <ChevronRight className="h-4 w-4" />
-                </Button>
-            </div>
+            {table.getPageCount() > 0 && (
+                <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                        Page {table.getState().pagination.pageIndex + 1} of{" "}
+                        {table.getPageCount()}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
